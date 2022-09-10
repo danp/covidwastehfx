@@ -49,7 +49,17 @@ jobs:
         last_year="$(date --date="$latest - 1 year" +"%Y-%m-%d")"
         url="https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=customrange&regions=8&sdate=${last_year}&edate=${latest}&sort=asc&grid=1&showDailyValues=false"
         echo "$url"
-        shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '#graph-container > div > div' "$url"
+        worked=0
+        for _ in 0 1 2 3; do
+          if shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '#graph-container > div > div' "$url"; then
+            worked=1
+            break
+          fi
+          sleep 10
+        done
+        if [ $worked -eq 0 ]; then
+          exit 1
+        fi
         tweet-images "COVID wastewater charts for the Halifax area as of $latest https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=alltime&sort=asc&grid=1&regions=8&showDailyValues=false" \
           /tmp/covid.png --alt "Screenshot of the charts" > latest-tweet.md
     - name: Commit latest-tweet.md
