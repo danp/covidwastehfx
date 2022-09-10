@@ -3,7 +3,7 @@ name: Tweet
 on:
   workflow_dispatch:
   schedule:
-  - cron: '0 14 * * *'
+  - cron: '0 14 * * Sat'
 
 jobs:
   scheduled:
@@ -35,8 +35,9 @@ jobs:
         git config user.email "actions@users.noreply.github.com"
     - name: Generate screenshot with shot-scraper
       run: |-
-        shot-scraper https://covid19.sccgov.org/dashboard-wastewater \
-          -s iframe --wait 3000 -b firefox --retina -o /tmp/covid.png
+        today="$(date +"%Y-%m-%d")"
+        last_year="$(date -d '1 year ago' +"%Y-%m-%d")"
+        shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '#graph-container > div > div' "https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=customrange&regions=8&sdate=${last_year}&edate=${today}&sort=asc&grid=1&showDailyValues=false"
     - name: Tweet the new image
       env:
         TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
@@ -44,7 +45,7 @@ jobs:
         TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
       run: |-
-        tweet-images "Latest Covid sewage charts for the SF Bay Area https://covid19.sccgov.org/dashboard-wastewater" \
+        tweet-images "Latest Covid wastewater charts for the Halifax area https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=alltime&sort=asc&grid=1&regions=8&showDailyValues=false" \
           /tmp/covid.png --alt "Screenshot of the charts" > latest-tweet.md
     - name: Commit latest-tweet.md
       run: |-
