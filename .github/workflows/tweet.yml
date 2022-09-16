@@ -60,7 +60,7 @@ jobs:
         if [ $worked -eq 0 ]; then
           exit 1
         fi
-        tweet-images "COVID wastewater charts for the Halifax area as of $latest https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=alltime&sort=asc&grid=1&regions=8&showDailyValues=false" \
+        tweet-images "COVID wastewater charts for the Halifax area as of $latest $url" \
           /tmp/covid.png --alt "Screenshot of the charts" > latest-tweet.md
     - name: Commit latest-tweet.md
       run: |-
