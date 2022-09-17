@@ -39,29 +39,7 @@ jobs:
         TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
         TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
         TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-      run: |-
-        set -eo pipefail
-        latest="$(curl --fail https://health-infobase.canada.ca/src/data/covidLive/wastewater/covid19-wastewater.csv | grep Halifax | sort | tail -n1 | cut -d, -f1)"
-        if cmp -s <(echo "$latest") latest-date; then
-           exit 0
-        fi
-        echo "$latest" > latest-date
-        last_year="$(date --date="$latest - 1 year" +"%Y-%m-%d")"
-        url="https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=customrange&regions=4&sdate=${last_year}&edate=${latest}&sort=asc&grid=1&showDailyValues=false"
-        echo "$url"
-        worked=0
-        for _ in 0 1 2 3; do
-          if shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '#graph-container > div > div' "$url"; then
-            worked=1
-            break
-          fi
-          sleep 10
-        done
-        if [ $worked -eq 0 ]; then
-          exit 1
-        fi
-        tweet-images "COVID wastewater charts for the Halifax area as of $latest $url" \
-          /tmp/covid.png --alt "Screenshot of the charts" > latest-tweet.md
+      run: bin/shot-and-tweet
     - name: Commit latest-tweet.md
       run: |-
         git add -A
