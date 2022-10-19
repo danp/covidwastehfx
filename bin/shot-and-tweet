@@ -26,7 +26,7 @@ echo "$url"
 
 worked=0
 for _ in 0 1 2 3; do
-    if shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '#graph-container > div > div' "$url"; then
+    if shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '.regionContainer' "$url"; then
         worked=1
         break
     fi
