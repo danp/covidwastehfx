@@ -1,1 +1,1 @@
-https://twitter.com/CovidWasteHfx/status/1593016366118113280
+https://twitter.com/CovidWasteHfx/status/1595463626617487363
