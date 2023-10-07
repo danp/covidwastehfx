@@ -1,4 +1,4 @@
-name: Tweet
+name: Post
 
 on:
   workflow_dispatch:
@@ -33,13 +33,8 @@ jobs:
       run: |-
         git config user.name "Automated"
         git config user.email "actions@users.noreply.github.com"
-    - name: Generate screenshot with shot-scraper and tweet
-      env:
-        TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
-        TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
-        TWITTER_ACCESS_TOKEN_KEY: ${{ secrets.TWITTER_ACCESS_TOKEN_KEY }}
-        TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
-      run: bin/shot-and-tweet
+    - name: Generate screenshot with shot-scraper
+      run: bin/shot-and-post
     - name: Commit latest-tweet.md
       run: |-
         git add -A

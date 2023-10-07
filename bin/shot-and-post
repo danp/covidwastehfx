@@ -55,6 +55,3 @@ fi
 if [ "$GITHUB_REF_NAME" != "main" ]; then
     exit 0
 fi
-
-tweet-images "COVID wastewater charts for the Halifax area as of $latest $url" \
-             /tmp/covid.png --alt "Screenshot of the charts" > latest-tweet.md
