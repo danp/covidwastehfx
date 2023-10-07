@@ -2,13 +2,27 @@
 
 set -eo pipefail
 
-latest="$(curl --fail https://health-infobase.canada.ca/src/data/covidLive/wastewater/covid19-wastewater.csv | grep Halifax | sort | tail -n1 | cut -d, -f1)"
+latest="$(curl --silent --fail https://health-infobase.canada.ca/src/data/covidLive/wastewater/covid19-wastewater.csv | grep Halifax | sort | tail -n1 | cut -d, -f1)"
 if cmp -s <(echo "$latest") latest-date && [ "$GITHUB_REF_NAME" = "main" ]; then
     exit 0
 fi
 echo "$latest" > latest-date
 
-last_year="$(date --date="$latest - 1 year" +"%Y-%m-%d")"
+echo "Latest date: $latest"
+
+last_year=""
+case "$(uname -s)" in
+    Linux)
+        last_year="$(date --date="$latest - 1 year" +"%Y-%m-%d")"
+        ;;
+    Darwin)
+        last_year="$(date -v-1y -jf "%Y-%m-%d" "$latest" +"%Y-%m-%d")"
+        ;;
+    *)
+        echo "Unknown OS" >&2
+        exit 1
+        ;;
+esac
 
 region=""
 for _ in 0 1 2 3; do
@@ -21,8 +35,10 @@ if [ "$region" = "" ]; then
     exit 1
 fi
 
+echo "Halifax region: $region"
+
 url="https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=customrange&regions=${region}&sdate=${last_year}&edate=${latest}&sort=asc&grid=1&showDailyValues=false"
-echo "$url"
+echo "Shot URL: $url"
 
 worked=0
 for _ in 0 1 2 3; do
