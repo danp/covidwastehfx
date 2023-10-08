@@ -36,7 +36,10 @@ jobs:
       run: |-
         git config user.name "Automated"
         git config user.email "actions@users.noreply.github.com"
-    - name: Generate screenshot with shot-scraper
+    - name: Generate screenshot with shot-scraper and post
+      env:
+        BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+        BSKY_PASSWORD: ${{ secrets.BSKY_PASSWORD }}
       run: bin/shot-and-post
     - name: Commit latest
       run: |-

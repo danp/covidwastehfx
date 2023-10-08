@@ -25,10 +25,12 @@ case "$(uname -s)" in
 esac
 
 region=""
-for _ in 0 1 2 3; do
+for try in 1 2 3 4 5 6 7 8 9 10; do
     region="$(shot-scraper javascript -b firefox https://health-infobase.canada.ca/covid-19/wastewater/ 'Array.from(document.querySelectorAll("optgroup > option.siteOption")).filter(v => (v.text == "Halifax"))[0]?.value' | jq -r '. // ""')"
     [ "$region" != "" ] && break
-    sleep 10
+    delay=$((try * 2))
+    echo "Failed to get the Halifax region id, retrying in $delay seconds" >&2
+    sleep $delay
 done
 if [ "$region" = "" ]; then
     echo "Couldn't figure out the Halifax region id." >&2
@@ -44,12 +46,14 @@ echo "COVID wastewater charts for the Halifax area as of $latest" > /tmp/post
 echo "Screenshot of the charts" > /tmp/post.image-0.alt
 
 worked=0
-for _ in 0 1 2 3; do
-    if shot-scraper -o /tmp/post.image-0 --retina -b firefox --selector-all '.regionContainer' "$url"; then
+for try in 1 2 3 4 5 6 7 8 9 10; do
+    if shot-scraper -o /tmp/post.image-0 --retina -b firefox --timeout 5000 --selector-all '.regionContainer' "$url"; then
         worked=1
         break
     fi
-    sleep 10
+    delay=$((try * 2))
+    echo "Failed to screenshot, retrying in $delay seconds" >&2
+    sleep $delay
 done
 if [ $worked -eq 0 ]; then
     exit 1
