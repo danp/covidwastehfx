@@ -1,6 +1,6 @@
 # CovidWasteHfx
 
-The [@CovidWasteHfx](https://twitter.com/CovidWasteHfx) Twitter bot.
+The [@CovidWasteHfx](https://bsky.app/profile/covidwastehfx.bsky.social) Bluesky bot.
 
 Forked from https://github.com/simonw/covidsewage-bot.
 

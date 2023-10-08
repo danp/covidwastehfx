@@ -6,7 +6,7 @@ latest="$(curl --silent --fail https://health-infobase.canada.ca/src/data/covidL
 if cmp -s <(echo "$latest") latest-date && [ "$GITHUB_REF_NAME" = "main" ]; then
     exit 0
 fi
-#echo "$latest" > latest-date
+echo "$latest" > latest-date
 
 echo "Latest date: $latest"
 
