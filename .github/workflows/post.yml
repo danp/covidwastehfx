@@ -27,8 +27,9 @@ jobs:
         curl -o /tmp/bluesky-post.gz --fail https://danp128.s3.amazonaws.com/bluesky-post.gz
         gunzip /tmp/bluesky-post.gz
         chmod +x /tmp/bluesky-post
-        mv /tmp/bluesky-post bin
-        echo "$PWD/bin" >> "$GITHUB_PATH"
+        mkdir -p "$HOME/bin"
+        mv /tmp/bluesky-post "$HOME/bin"
+        echo "$HOME/bin" >> "$GITHUB_PATH"
     - name: Install Playwright browser
       run: |
         shot-scraper install -b firefox
