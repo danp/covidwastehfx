@@ -6,7 +6,7 @@ latest="$(curl --silent --fail https://health-infobase.canada.ca/src/data/covidL
 if cmp -s <(echo "$latest") latest-date && [ "$GITHUB_REF_NAME" = "main" ]; then
     exit 0
 fi
-echo "$latest" > latest-date
+#echo "$latest" > latest-date
 
 echo "Latest date: $latest"
 
@@ -40,9 +40,12 @@ echo "Halifax region: $region"
 url="https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=customrange&regions=${region}&sdate=${last_year}&edate=${latest}&sort=asc&grid=1&showDailyValues=false"
 echo "Shot URL: $url"
 
+echo "COVID wastewater charts for the Halifax area as of $latest" > /tmp/post
+echo "Screenshot of the charts" > /tmp/post.image-0.alt
+
 worked=0
 for _ in 0 1 2 3; do
-    if shot-scraper -o /tmp/covid.png --retina -b firefox --selector-all '.regionContainer' "$url"; then
+    if shot-scraper -o /tmp/post.image-0 --retina -b firefox --selector-all '.regionContainer' "$url"; then
         worked=1
         break
     fi
@@ -55,3 +58,5 @@ fi
 if [ "$GITHUB_REF_NAME" != "main" ]; then
     exit 0
 fi
+
+bluesky-post /tmp/post

@@ -24,6 +24,11 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
+        curl -o --fail /tmp/bluesky-post.gz https://danp128.s3.amazonaws.com/bluesky-post.gz
+        gunzip /tmp/bluesky-post.gz
+        chmod +x /tmp/bluesky-post
+        mv /tmp/bluesky-post bin
+        echo "$PWD/bin" >> "$GITHUB_PATH"
     - name: Install Playwright browser
       run: |
         shot-scraper install -b firefox
