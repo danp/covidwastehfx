@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        curl -o --fail /tmp/bluesky-post.gz https://danp128.s3.amazonaws.com/bluesky-post.gz
+        curl -o /tmp/bluesky-post.gz --fail https://danp128.s3.amazonaws.com/bluesky-post.gz
         gunzip /tmp/bluesky-post.gz
         chmod +x /tmp/bluesky-post
         mv /tmp/bluesky-post bin
