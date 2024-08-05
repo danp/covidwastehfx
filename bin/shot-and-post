@@ -2,62 +2,16 @@
 
 set -eo pipefail
 
-latest="$(curl --silent --fail https://health-infobase.canada.ca/src/data/covidLive/wastewater/covid19-wastewater.csv | grep Halifax | sort | tail -n1 | cut -d, -f1)"
+latest="$(curl --silent --fail curl 'https://health-infobase.canada.ca/api/wastewater/query?q=SELECT+max%28weekstart%29+FROM+wastewater_aggregate+WHERE+Location+%3D+%22Halifax%22+AND+measureid+%3D+%22covN2%22' | jq -r '.[0]["max(weekstart)"]')"
 if cmp -s <(echo "$latest") latest-date && [ "$GITHUB_REF_NAME" = "main" ]; then
     exit 0
 fi
 echo "$latest" > latest-date
 
-echo "Latest date: $latest"
-
-last_year=""
-case "$(uname -s)" in
-    Linux)
-        last_year="$(date --date="$latest - 1 year" +"%Y-%m-%d")"
-        ;;
-    Darwin)
-        last_year="$(date -v-1y -jf "%Y-%m-%d" "$latest" +"%Y-%m-%d")"
-        ;;
-    *)
-        echo "Unknown OS" >&2
-        exit 1
-        ;;
-esac
-
-region=""
-for try in 1 2 3 4 5 6 7 8 9 10; do
-    region="$(shot-scraper javascript -b firefox https://health-infobase.canada.ca/covid-19/wastewater/ 'Array.from(document.querySelectorAll("optgroup > option.siteOption")).filter(v => (v.text == "Halifax"))[0]?.value' | jq -r '. // ""')"
-    [ "$region" != "" ] && break
-    delay=$((try * 2))
-    echo "Failed to get the Halifax region id, retrying in $delay seconds" >&2
-    sleep $delay
-done
-if [ "$region" = "" ]; then
-    echo "Couldn't figure out the Halifax region id." >&2
-    exit 1
-fi
-
-echo "Halifax region: $region"
-
-url="https://health-infobase.canada.ca/covid-19/wastewater/?dateSel=customrange&regions=${region}&sdate=${last_year}&edate=${latest}&sort=asc&grid=1&showDailyValues=false"
-echo "Shot URL: $url"
+bin/shot.py /tmp/post.image-0
 
 echo "COVID wastewater charts for the Halifax area as of $latest" > /tmp/post
 echo "Screenshot of the charts" > /tmp/post.image-0.alt
-
-worked=0
-for try in 1 2 3 4 5 6 7 8 9 10; do
-    if shot-scraper -o /tmp/post.image-0 --retina -b firefox --timeout 5000 --selector-all '.regionContainer' "$url"; then
-        worked=1
-        break
-    fi
-    delay=$((try * 2))
-    echo "Failed to screenshot, retrying in $delay seconds" >&2
-    sleep $delay
-done
-if [ $worked -eq 0 ]; then
-    exit 1
-fi
 
 if [ "$GITHUB_REF_NAME" != "main" ]; then
     exit 0
