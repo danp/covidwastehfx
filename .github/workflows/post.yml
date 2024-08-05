@@ -23,6 +23,9 @@ jobs:
         key: ${{ runner.os }}-browsers
     - name: Install dependencies
       run: |
+        mkdir venv
+        python -m venv venv
+        source venv/bin/activate
         pip install -r requirements.txt
         curl -o /tmp/bluesky-post.gz --fail https://danp128.s3.amazonaws.com/bluesky-post.gz
         gunzip /tmp/bluesky-post.gz
@@ -32,7 +35,8 @@ jobs:
         echo "$HOME/bin" >> "$GITHUB_PATH"
     - name: Install Playwright browser
       run: |
-        shot-scraper install -b firefox
+        source venv/bin/activate
+        playwright install firefox
     - name: Configure Git for commits
       run: |-
         git config user.name "Automated"
@@ -41,7 +45,9 @@ jobs:
       env:
         BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
         BSKY_PASSWORD: ${{ secrets.BSKY_PASSWORD }}
-      run: bin/shot-and-post
+      run: |
+        source venv/bin/activate
+        bin/shot-and-post
     - name: Commit latest
       run: |-
         git add -A
