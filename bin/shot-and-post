@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-latest="$(curl --silent --fail curl 'https://health-infobase.canada.ca/api/wastewater/query?q=SELECT+max%28weekstart%29+FROM+wastewater_aggregate+WHERE+Location+%3D+%22Halifax%22+AND+measureid+%3D+%22covN2%22' | jq -r '.[0]["max(weekstart)"]')"
+latest="$(curl --silent --fail 'https://health-infobase.canada.ca/api/wastewater/query?q=SELECT+max%28weekstart%29+FROM+wastewater_aggregate+WHERE+Location+%3D+%22Halifax%22+AND+measureid+%3D+%22covN2%22' | jq -r '.[0]["max(weekstart)"]')"
 if cmp -s <(echo "$latest") latest-date && [ "$GITHUB_REF_NAME" = "main" ]; then
     exit 0
 fi
