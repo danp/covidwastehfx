@@ -8,10 +8,12 @@ if cmp -s <(echo "$latest") latest-date && [ "$GITHUB_REF_NAME" = "main" ]; then
 fi
 echo "$latest" > latest-date
 
-bin/shot.py /tmp/post.image-0
+bin/shot.py /tmp/post.image-
 
 echo "COVID wastewater charts for the Halifax area as of $latest" > /tmp/post
-echo "Screenshot of the charts" > /tmp/post.image-0.alt
+for img in /tmp/post.image-*; do
+    echo "Screenshot of the chart" > "$img.alt"
+done
 
 if [ "$GITHUB_REF_NAME" != "main" ]; then
     exit 0
