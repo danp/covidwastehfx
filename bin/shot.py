@@ -25,7 +25,7 @@ def main(args):
             level = div.locator("span.badge").text_content()
             levels.append((place, level))
             base = f"{post_path}.image-{idx}"
-            div.screenshot(path=base)
+            div.screenshot(path=base, type="png")
             with open(f"{base}.alt", "w") as f:
                 f.write(f"Chart for {place} as of {date} showing the level of COVID-19 in wastewater as {level}.")
 
