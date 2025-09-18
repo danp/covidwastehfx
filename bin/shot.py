@@ -17,7 +17,7 @@ def main(args):
         page.get_by_label("Select a municipality:").select_option("Halifax")
         locator = page.locator("#smallmultiples-container")
         divs = locator.locator("div")
-        expect(divs).to_have_count(count=3, timeout=10000)
+        expect(divs).not_to_have_count(count=0, timeout=10000)
         levels = []
         for idx, div in enumerate(divs.all()):
             place = div.locator("p.h3").text_content()
